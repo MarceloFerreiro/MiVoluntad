@@ -49,10 +49,10 @@ Si hay cualquier duda, que llamen a mi sobrino Ramón al 655 123 456.""",
     ),
     (
         "mensajes de chat",
-        """Mi hija Lucía Fernández es la que me cuida desde que murió mi marido, Ernesto.
+        """me llamo rosario y mi hija Lucía Fernández es la que me cuida desde que murió mi marido, Ernesto.
 Mi hijo Andrés vive en Bilbao y casi no viene. Si quiere escribirme, mi correo es manolo.ortega@hotmail.com
 y mi móvil el 699 88 77 66.""",
-        [("PERSONA", "Lucía Fernández"), ("PERSONA", "Ernesto"), ("PERSONA", "Andrés"),
+        [("PERSONA", "rosario"), ("PERSONA", "Lucía Fernández"), ("PERSONA", "Ernesto"), ("PERSONA", "Andrés"),
          ("EMAIL", "manolo.ortega@hotmail.com"), ("TELEFONO", "699 88 77 66")],
     ),
     (

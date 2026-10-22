@@ -1,6 +1,7 @@
 """Servidor local del chat: sirve web/index.html y expone la API del asistente.
 
 Uso: python server.py [--rebuild]  ->  abrir http://localhost:8000
+     WhatsApp (Twilio): POST /whatsapp, configuración en src/whatsapp.py y .env.example
      --rebuild extrae con OCR las fotos y PDFs nuevos de ocr/ a manuales/ y vuelve a
                indexar pdfs/, manuales/ y modelos/
 
@@ -22,6 +23,7 @@ import json
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import parse_qs
 
 from dotenv import load_dotenv
 from rich.console import Console
@@ -35,6 +37,7 @@ from src.preprocessing.ocr import ocr_image, tesseract_available
 from src.privacy.pseudonymizer import Pseudonymizer
 from src.rag.RAGSystem import RAGSystem
 from src.utils.sources import source_detail, source_label
+from src.whatsapp import WhatsAppChannel
 
 HOST, PORT = "127.0.0.1", 8000
 MODEL = "claude-haiku-5-5"
@@ -50,6 +53,7 @@ ROOT = Path(__file__).parent
 WEB = ROOT / "web"
 
 rag = None
+whatsapp = None
 # RAGSystem keeps the history of the request being answered: one request at a time
 rag_lock = threading.Lock()
 
@@ -207,7 +211,23 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self._send_json(404, {"error": "No encontrado"})
 
+    def _whatsapp(self):
+        """Twilio webhook: validate the signature, acknowledge at once, answer in background."""
+        if not whatsapp.configured:
+            self._send(503, b"WhatsApp no configurado", "text/plain; charset=utf-8")
+            return
+        length = int(self.headers.get("Content-Length", 0))
+        form = parse_qs(self.rfile.read(length).decode("utf-8"), keep_blank_values=True)
+        params = {key: values[0] for key, values in form.items()}
+        if not whatsapp.valid_signature(params, self.headers.get("X-Twilio-Signature", "")):
+            self._send(403, b"Firma de Twilio no valida", "text/plain; charset=utf-8")
+            return
+        self._send(200, whatsapp.handle(params).encode("utf-8"), "text/xml; charset=utf-8")
+
     def do_POST(self):
+        if self.path == "/whatsapp":
+            self._whatsapp()
+            return
         if self.path != "/api/chat":
             self._send_json(404, {"error": "No encontrado"})
             return
@@ -227,7 +247,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    global rag
+    global rag, whatsapp
     parser = argparse.ArgumentParser(description="Servidor local del chat Testamento Fácil")
     parser.add_argument("--rebuild", action="store_true", help="OCR de las fotos y PDFs de ocr/ a manuales/ y volver a indexar pdfs/, manuales/ y modelos/")
     args = parser.parse_args()
@@ -236,6 +256,12 @@ def main():
     rag = build_rag(rebuild=args.rebuild)
     print(f"Cargando detectores de datos personales (regex + {' + '.join(PRIVACY_NER)})...")
     Pseudonymizer(ner=PRIVACY_NER).mask("Precarga de los modelos de privacidad.")
+    whatsapp = WhatsAppChannel(chat)
+    if whatsapp.configured:
+        print(f"WhatsApp activo: webhook de Twilio en {whatsapp.public_url}")
+    else:
+        print("WhatsApp desactivado: faltan TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM o PUBLIC_URL en .env")
+
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"Listo: abre http://localhost:{PORT} en el navegador (Ctrl+C para parar)")
     try:

@@ -49,3 +49,9 @@ palabras junto a un dato real, p. ej. "paco nada" -> "[PERSONA]", que cambia el 
 - spaCy marcaba "paco nada" como nombre y se perdía "nada": ahora se recortan por los extremos las
   palabras en minúscula que no son nombres del diccionario.
 - Ojo: el diccionario y los casos los escribió la misma persona; validar con textos reales.
+
+### Actualización: regla "me llamo …"
+
+Se añadió al chat de prueba "me llamo rosario" (nombre ambiguo, en minúscula). Nueva regla de
+contexto: lo que sigue a "me llamo" / "mi nombre es" es un nombre aunque esté en minúscula.
+Resultado regex + Presidio: **37/37**, 0 falsos positivos, 0 ocultado de más.

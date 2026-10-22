@@ -33,6 +33,11 @@ REGEX_DETECTORS: List[Tuple[str, re.Pattern, int]] = [
         rf'\b(?:D\.ª|Dª|D\.|DON|DOÑA|Don|Doña)\s+({NAME_WORD}(?:\s+(?:de\s+la\s+|de\s+|del\s+)?{NAME_WORD}){{0,4}})'), 1),
     # "Yo, ANA RUIZ, Notario" / "Ante mí, ANTONIO RUIZ MARTÍN, Notario"
     ("PERSONA", re.compile(rf'\b(?:Yo|mí),\s+({NAME_WORD}(?:\s+{NAME_WORD}){{1,4}}),\s+Notari'), 1),
+    # The person says their name: "me llamo rosario", "mi nombre es Ana López" (even lowercase or a
+    # name that is also a common word). Extra words are taken only when capitalized.
+    ("PERSONA", re.compile(
+        r'\b(?i:me\s+llamo|mi\s+nombre\s+es|ll[aá]meme)\s+'
+        r'([A-Za-zÁÉÍÓÚÑáéíóúñü]{2,}(?:\s+(?:de\s+(?:la\s+)?)?[A-ZÁÉÍÓÚÑ][a-záéíóúñü]+){0,3})'), 1),
 ]
 
 # Capitalized words spaCy sometimes tags as people in legal texts
