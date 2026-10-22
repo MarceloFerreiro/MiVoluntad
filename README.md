@@ -55,3 +55,16 @@ La primera vez, el móvil avisa de que el certificado no es de confianza: *Confi
 - [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md): qué datos se tratan, seudonimización, cifrado y borrado.
 - [docs/DATOS.md](docs/DATOS.md): inventario de documentos y cómo añadir más.
 - [docs/cuestionario/CUESTIONARIO.md](docs/cuestionario/CUESTIONARIO.md): el cuestionario del borrador.
+
+## Licencia
+
+El **código** de este repositorio se distribuye bajo licencia [MIT](LICENSE).
+`src/preprocessing/BM25.py` procede de un gist bajo CC0.
+
+Los **documentos** de `pdfs/`, `manuales/`, `ocr/` y `modelos/` **no** están cubiertos por la licencia
+MIT: conservan sus propios derechos.
+
+- Las leyes (BOE y Diario Oficial de la UE) son textos oficiales de libre reutilización, citando la fuente.
+- El libro escaneado (`ocr/manual_el_testamento.pdf` y su texto en `manuales/`) y los modelos de testamento
+  de notarías están protegidos por derechos de autor. Se usan solo como material de consulta interno del
+  prototipo. Si el repositorio se hace público, hay que retirarlos o pedir permiso a sus autores.
