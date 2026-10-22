@@ -78,6 +78,7 @@ class DocumentProcessor:
             folder=modelos_folder,
             fuente="modelo",
             description="Modelo de testamento (ejemplo orientativo de redacción, no es texto legal)",
+            chunk_size=2000,  # bigger chunks so testament clauses are not cut in half
             verbose=self.verbose
         )
 
@@ -101,7 +102,7 @@ class DocumentProcessor:
         Returns:
             List of Document chunks
         """
-        pdfs = sorted(self.pdfs_folder.glob("*.pdf"))
+        pdfs = sorted(self.pdfs_folder.rglob("*.pdf"))  # subfolders: pdfs/espana, pdfs/ue...
         if not pdfs:
             raise FileNotFoundError(f"No hay PDFs en {self.pdfs_folder}/")
 

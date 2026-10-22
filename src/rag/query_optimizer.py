@@ -1,5 +1,5 @@
 """Query optimization functionality."""
-from typing import Tuple, Any
+from typing import Any, Optional, Tuple
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -37,7 +37,7 @@ class QueryOptimizer:
         else:
             return 'unknown'
     
-    def should_retrieve_documents(self, user_question: str, history_text: str) -> Tuple[bool, str]:
+    def should_retrieve_documents(self, user_question: str, history_text: str) -> Tuple[bool, str, Optional[str]]:
         """Determine if retrieval is needed and generate optimized query.
         
         Args:
@@ -45,7 +45,8 @@ class QueryOptimizer:
             history_text: Formatted conversation history
             
         Returns:
-            (should_retrieve, optimized_query)
+            (should_retrieve, optimized_query, notary_place): notary_place is set when the
+            person asks for notaries near a place
         """
         query_prompt = ChatPromptTemplate.from_template(few_shot_classification_prompt)
 
@@ -70,7 +71,11 @@ class QueryOptimizer:
 
             # Explicit decision to NOT retrieve
             if response.upper().startswith("NO_RETRIEVAL"):
-                return False, ""
+                return False, "", None
+
+            # Notaries near a place: no document search, the caller looks them up
+            if response.upper().startswith("NOTARIAS:"):
+                return False, "", response.split(":", 1)[1].strip() or None
 
             # Clean common prefixes
             prefixes = (
@@ -92,7 +97,7 @@ class QueryOptimizer:
             response_words = response.split()
             optimized_query = " ".join(response_words[:15])
 
-            return True, optimized_query
+            return True, optimized_query, None
 
         except Exception as e:
             self.log(
@@ -100,7 +105,7 @@ class QueryOptimizer:
                 "error"
             )
             # Fail-safe: better to search than not search
-            return True, user_question
+            return True, user_question, None
     
     def log(self, message: str, level: str = "info") -> None:
         """Log a message with appropriate styling based on level."""

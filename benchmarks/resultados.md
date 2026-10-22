@@ -55,3 +55,12 @@ palabras junto a un dato real, p. ej. "paco nada" -> "[PERSONA]", que cambia el 
 Se añadió al chat de prueba "me llamo rosario" (nombre ambiguo, en minúscula). Nueva regla de
 contexto: lo que sigue a "me llamo" / "mi nombre es" es un nombre aunque esté en minúscula.
 Resultado regex + Presidio: **37/37**, 0 falsos positivos, 0 ocultado de más.
+
+### Actualización: direcciones abreviadas y en lenguas cooficiales
+
+Un usuario escribió «trav. arteixo 335 3F» y no se ocultaba: la regla solo conocía tipos de vía
+completos. Ahora reconoce abreviaturas (c/, c., trav., avda., pº, ctra., urb.…), gallego (rúa, praza,
+estrada), catalán (carrer, avinguda, plaça, passeig) y euskera (kalea), «s/n» y pisos como «3F»,
+«2º izda», «bajo» o «ático». Se añadió un caso con 4 direcciones de este tipo.
+Resultado regex + Presidio: **41/41**, 0 falsos positivos, 0 ocultado de más
+(se corrigió «Carrer de Balmes 150 y…», donde la «y» se tomaba por la letra del portal).

@@ -47,7 +47,7 @@ def main():
 
     total = 0.0
     out = [
-        "CONVERSACIÓN DE PRUEBA — Testamento Fácil",
+        "CONVERSACIÓN DE PRUEBA — Mi Voluntad",
         f"Fecha: {datetime.date.today():%d/%m/%Y} · Modelo: {MODEL} (effort low) · RAG: Código Civil (FAISS + BM25)",
         f"Escenario: {ESCENARIO}",
         "=" * 90,

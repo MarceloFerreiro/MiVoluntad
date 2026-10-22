@@ -1,14 +1,19 @@
 """WhatsApp channel through Twilio: one conversation per phone number, same assistant as the web chat.
 
-Twilio cuts webhooks off after 15 seconds and our answers take longer (RAG + LLM, OCR for
-photos), so the webhook only acknowledges the message and the answer is sent afterwards
-with the Twilio REST API from a background thread.
+Two ways to answer (WHATSAPP_MODO in .env):
+- "twiml" (default): the answer goes in the webhook response itself. It is the only way that
+  works on Twilio's trial / "Try it out" WhatsApp senders, where messages sent through the REST
+  API need an approved template ("ContentSid Required"). Twilio cuts webhooks off after 15 s, so
+  if the answer takes longer the person is asked to send any message ("ok") to receive it.
+- "api": the webhook only acknowledges and the answer is sent later through the REST API.
+  For a production WhatsApp Business sender, where free text is allowed within 24 h.
 
 Configuration (.env):
     TWILIO_ACCOUNT_SID     Account SID (AC...)
     TWILIO_AUTH_TOKEN      Auth Token: validates Twilio signatures and sends messages
     TWILIO_WHATSAPP_FROM   Sender, e.g. whatsapp:+14155238886 (sandbox)
     PUBLIC_URL             Exact webhook URL configured in Twilio, e.g. https://abc.ngrok-free.app/whatsapp
+    WHATSAPP_MODO          twiml (default) or api
 """
 import base64
 import hashlib
@@ -24,9 +29,16 @@ MAX_HISTORY_TURNS = 30
 MAX_MESSAGE_CHARS = 1500
 RESET_COMMANDS = {"borrar", "nueva conversacion", "nueva conversación", "empezar de nuevo", "reiniciar"}
 HELP_COMMANDS = {"ayuda", "menu", "menú"}
+# Twiml mode: answer within the webhook if ready before this; Twilio gives up at 15 s
+SYNC_BUDGET_SECONDS = 12
+STILL_WORKING = (
+    "Lo estoy preparando, tardo un poco más de lo normal. "
+    "Envíeme cualquier mensaje (por ejemplo, *ok*) en unos segundos y le respondo."
+)
+ERROR_TEXT = "Perdone, ha habido un problema al responderle. ¿Puede intentarlo otra vez?"
 
 HELP_TEXT = (
-    "Soy *Testamento Fácil*. Le explico cómo hacer su testamento con palabras sencillas.\n\n"
+    "Soy *Mi Voluntad*. Le explico cómo hacer su testamento con palabras sencillas.\n\n"
     "• Escríbame su duda, por ejemplo: _quiero hacer mi testamento_.\n"
     "• Puede enviarme una *foto* de un documento (por ejemplo, su testamento) y se lo explico.\n"
     "• Escriba *borrar* para empezar una conversación nueva.\n\n"
@@ -38,8 +50,10 @@ def empty_twiml() -> str:
     return '<?xml version="1.0" encoding="UTF-8"?><Response></Response>'
 
 
-def message_twiml(text: str) -> str:
-    return f'<?xml version="1.0" encoding="UTF-8"?><Response><Message>{escape(text)}</Message></Response>'
+def message_twiml(*texts: str) -> str:
+    """TwiML answering with one WhatsApp message per text."""
+    body = "".join(f"<Message>{escape(text)}</Message>" for text in texts)
+    return f'<?xml version="1.0" encoding="UTF-8"?><Response>{body}</Response>'
 
 
 def to_whatsapp_format(markdown: str) -> str:
@@ -96,10 +110,13 @@ class WhatsAppChannel:
         self.auth_token = os.environ.get("TWILIO_AUTH_TOKEN", "")
         self.from_number = os.environ.get("TWILIO_WHATSAPP_FROM", "")
         self.public_url = os.environ.get("PUBLIC_URL", "")
+        self.mode = os.environ.get("WHATSAPP_MODO", "twiml").strip().lower()
         self.send = sender or self._twilio_send
         self.fetch_media = media_fetcher or self._twilio_fetch_media
         # phone number -> {"history": [...], "privacy_map": {...}}; the history is the masked one
         self.sessions: Dict[str, dict] = {}
+        # twiml mode: phone number -> answer still being prepared {"done": Event, "parts": [...]}
+        self.pending: Dict[str, dict] = {}
         self._locks: Dict[str, threading.Lock] = {}
         self._locks_guard = threading.Lock()
         self._client = None
@@ -117,8 +134,10 @@ class WhatsAppChannel:
 
     def _twilio_send(self, to: str, body: str) -> None:
         if self._client is None:
+            from twilio.http.http_client import TwilioHttpClient
             from twilio.rest import Client
-            self._client = Client(self.account_sid, self.auth_token)
+            # Without a timeout a stuck request would block this person's conversation forever
+            self._client = Client(self.account_sid, self.auth_token, http_client=TwilioHttpClient(timeout=30))
         self._client.messages.create(from_=self.from_number, to=to, body=body)
 
     def _twilio_fetch_media(self, url: str) -> bytes:
@@ -126,6 +145,15 @@ class WhatsAppChannel:
         response = requests.get(url, auth=(self.account_sid, self.auth_token), timeout=30)
         response.raise_for_status()
         return response.content
+
+    def purge_expired(self, max_age_seconds: float) -> int:
+        """Forget conversations (history and correspondence table) unused for too long."""
+        limit = time.time() - max_age_seconds
+        expired = [n for n, s in list(self.sessions.items()) if s.get("last_seen", 0) < limit]
+        for number in expired:
+            self.sessions.pop(number, None)
+            self.pending.pop(number, None)
+        return len(expired)
 
     # ---------- incoming messages ----------
 
@@ -147,6 +175,15 @@ class WhatsAppChannel:
 
         if not number:
             return empty_twiml()
+
+        # Twiml mode: an answer that was too slow for the previous webhook is delivered now
+        waiting = self.pending.get(number)
+        if waiting is not None:
+            if not waiting["done"].is_set():
+                return message_twiml("Todavía lo estoy preparando. Escríbame de nuevo en unos segundos, por favor.")
+            del self.pending[number]
+            return message_twiml(*waiting["parts"])
+
         if text.lower() in RESET_COMMANDS:
             self.sessions.pop(number, None)
             return message_twiml("Hecho. He borrado nuestra conversación y sus datos. ¿En qué le puedo ayudar?")
@@ -165,16 +202,40 @@ class WhatsAppChannel:
         elif not text:
             return message_twiml("Solo puedo leer mensajes de texto y fotos.")
 
-        threading.Thread(target=self._answer, args=(number, text, media), daemon=True).start()
-        if media:
-            return message_twiml("He recibido la foto. La estoy leyendo, deme un momento…")
-        return empty_twiml()
+        if self.mode == "api":
+            threading.Thread(target=self._answer_by_api, args=(number, text, media), daemon=True).start()
+            if media:
+                return message_twiml("He recibido la foto. La estoy leyendo, deme un momento…")
+            return empty_twiml()
 
-    def _answer(self, number: str, text: str, media: Optional[tuple]) -> None:
-        """Background: run the assistant and send the answer through the REST API."""
+        # Twiml mode: wait a little for the answer; if it is slower, keep it for the next message
+        job = {"done": threading.Event(), "parts": []}
+
+        def work():
+            job["parts"] = self._answer_parts(number, text, media)
+            job["done"].set()
+
+        threading.Thread(target=work, daemon=True).start()
+        if job["done"].wait(SYNC_BUDGET_SECONDS):
+            return message_twiml(*job["parts"])
+        self.pending[number] = job
+        return message_twiml(STILL_WORKING)
+
+    def _answer_by_api(self, number: str, text: str, media: Optional[tuple]) -> None:
+        """Api mode, in background: compute the answer and send it through the REST API."""
+        for part in self._answer_parts(number, text, media):
+            try:
+                self.send(number, part)
+            except Exception as e:
+                print(f"[whatsapp] {self._log_id(number)}: no se pudo enviar: {type(e).__name__}: {e}")
+                return
+
+    def _answer_parts(self, number: str, text: str, media: Optional[tuple]) -> List[str]:
+        """Run the assistant for this person and return the answer as WhatsApp messages."""
         with self._lock_for(number):
             started = time.time()
             session = self.sessions.setdefault(number, {"history": [], "privacy_map": {}})
+            session["last_seen"] = time.time()
             try:
                 payload = {
                     "message": text,
@@ -197,14 +258,11 @@ class WhatsAppChannel:
                 if result.get("privacy_map") is not None:
                     session["privacy_map"] = result["privacy_map"]
 
-                for part in split_message(to_whatsapp_format(result["answer"])):
-                    self.send(number, part)
-                print(f"[whatsapp] {self._log_id(number)}: respondido en {time.time() - started:.1f}s "
-                      f"(memoria {len(session['history'])} turnos)")
+                parts = split_message(to_whatsapp_format(result["answer"]))
+                print(f"[whatsapp] {self._log_id(number)}: respuesta lista en {time.time() - started:.1f}s "
+                      f"({len(parts)} mensaje(s), memoria {len(session['history'])} turnos)")
+                return parts
             except Exception as e:
                 # Never log the user's text or number
                 print(f"[whatsapp] {self._log_id(number)}: error {type(e).__name__}: {e}")
-                try:
-                    self.send(number, "Perdone, ha habido un problema al responderle. ¿Puede intentarlo otra vez?")
-                except Exception as send_error:
-                    print(f"[whatsapp] {self._log_id(number)}: no se pudo avisar del error: {send_error}")
+                return [ERROR_TEXT]

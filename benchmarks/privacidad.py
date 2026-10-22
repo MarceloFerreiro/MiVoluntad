@@ -66,6 +66,13 @@ Puede contactar con la gestora, Elena Marín, en el 983 456 789 o en elena.marin
          ("TELEFONO", "983 456 789"), ("EMAIL", "elena.marin@gestoria-ejemplo.es")],
     ),
     (
+        "direcciones abreviadas y en lenguas cooficiales",
+        """soy de trav. arteixo 335 3F, y la casa del pueblo esta en la Rúa Nova 12, 2º izda.
+mi hermano vive en el Carrer de Balmes 150 y mi hija en C/ Mayor s/n.""",
+        [("DIRECCION", "trav. arteixo 335 3F"), ("DIRECCION", "Rúa Nova 12, 2º izda"),
+         ("DIRECCION", "Carrer de Balmes 150"), ("DIRECCION", "C/ Mayor s/n")],
+    ),
+    (
         "caso difícil (minúsculas, sin tildes)",
         """quiero dejarle la casa a mi sobrina maria jose porque me cuida, y a mi hermano paco nada de nada.
 la casa esta en calle real 14 de segovia. mi dni lo tiene mi hija rocio.""",
@@ -84,7 +91,12 @@ La Ley 39/2015 regula el procedimiento administrativo. El Registro General de Ac
 en el jardín tengo una rosa preciosa y la tina del baño está rota. mi coche es un mercedes viejo.
 fui a la cruz roja y a la farmacia. que alegría que me lo explique tan clara, de verdad.
 quiero que mis hijos esten bien y que no se peleen, tengo fe en que el notario me ayude.
-a mi edad uno ya no esta para sustos, la luz me la pagan mis nietos. el domingo voy a misa.""",
+a mi edad uno ya no esta para sustos, la luz me la pagan mis nietos. el domingo voy a misa.
+Viuda
+Casado
+Separación de bienes
+Explíquemelo
+Gananciales""",
         [],
     ),
 ]

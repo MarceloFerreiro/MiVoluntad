@@ -42,6 +42,7 @@ class RAGSystem:
         bm25_index: Optional[Any] = None,
         bm25_documents: Optional[List] = None,
         use_query_optimization: bool = True,  
+        notary_lookup: Optional[Any] = None,
     ):
         """Initialize the RAG system with query optimization support.
         
@@ -61,6 +62,7 @@ class RAGSystem:
             bm25_index: BM25 index object
             bm25_documents: List of documents for BM25
             use_query_optimization: Enable two-stage query optimization
+            notary_lookup: Optional function(place) -> text block with notaries near that place
         """
         self.vectorstore = vectorstore
         self.language = language
@@ -76,6 +78,7 @@ class RAGSystem:
         self.bm25_documents = bm25_documents
         self.bm25_weight = bm25_weight
         self.use_query_optimization = use_query_optimization
+        self.notary_lookup = notary_lookup
         
         # Console setup (must be before component initialization)
         from src.utils.rich_utils import get_console, get_verbose
@@ -90,7 +93,7 @@ class RAGSystem:
         self.pricing = {
             'claude-haiku-5-5': {'input': 0.10, 'output': 0.50},
             'claude-sonnet-5-5': {'input': 2.00, 'output': 10.00},
-            'claude-opus-5-5': {'input': 4.00, 'output': 20.00},
+            'claude-opus-5-5': {'input': 4.00, 'output': 20.00},  # Sonnet/Opus: precios de la API de Anthropic
         }
 
         self.cost_tracker = CostTracker(self.pricing)
@@ -215,9 +218,10 @@ class RAGSystem:
     def _create_prompt_template(self) -> ChatPromptTemplate:
         """Create the retrieval prompt: assistant persona as system message, articles + question as user turn."""
         return ChatPromptTemplate.from_messages([
-            ("system", SYSTEM_PROMPT),
+            # Two channels: instructions + retrieved material (system) and the person's words (human)
+            ("system", SYSTEM_PROMPT + retrieval_prompt),
             MessagesPlaceholder("history"),
-            ("human", retrieval_prompt),
+            ("human", "{input}"),
         ])
     
     
@@ -232,6 +236,12 @@ class RAGSystem:
             prompt=self.prompt
         )
     
+    def set_llm(self, llm: Any) -> None:
+        """Switch the answer model (e.g. Haiku -> Sonnet) keeping index, history and query model."""
+        if llm is not self.llm:
+            self.llm = llm
+            self._create_rag_chain()
+
     def _apply_bm25_reranking(self, query: str, documents: List[Document]) -> List[Document]:
         """Apply BM25 reranking to retrieved documents.
         
@@ -294,13 +304,21 @@ class RAGSystem:
         # -----------------------------
         # 2. Decide whether to retrieve
         # -----------------------------
+        notary_place = None
         if self.query_optimizer:
-            should_retrieve, search_query = self.query_optimizer.should_retrieve_documents(
+            should_retrieve, search_query, notary_place = self.query_optimizer.should_retrieve_documents(
                 question,
                 history_text
             )
         else:
             should_retrieve, search_query = True, question
+
+        # Notaries near a place: the lookup result goes to the answer as extra context
+        extra = ""
+        if notary_place and self.notary_lookup:
+            extra = "\n<datos_de_notarias>\n" + self.notary_lookup(notary_place) + "\n</datos_de_notarias>\n"
+            if self.verbose:
+                self.log(f"🏛️ Notarías cerca de: {notary_place}", "info")
 
         if self.verbose:
             self.log(f"📝 Pregunta: {question}", "info")
@@ -318,9 +336,9 @@ class RAGSystem:
             # ---- Direct answer (no retrieval) ----
 
             prompt = ChatPromptTemplate.from_messages([
-                ("system", SYSTEM_PROMPT),
+                ("system", SYSTEM_PROMPT + no_retrieval_prompt),
                 MessagesPlaceholder("history"),
-                ("human", no_retrieval_prompt),
+                ("human", "{input}"),
             ])
             chain = prompt | self.llm | StrOutputParser()
 
@@ -334,6 +352,7 @@ class RAGSystem:
                 {
                     "input": question,
                     "history": history_messages,
+                    "extra": extra,
                 },
                 config={"callbacks": [callback]},
             )
@@ -355,6 +374,7 @@ class RAGSystem:
                     "context": source_docs,
                     "input": question,
                     "history": history_messages,
+                    "extra": extra,
                 },
                 config={"callbacks": [callback]},
             )

@@ -22,10 +22,16 @@ REGEX_DETECTORS: List[Tuple[str, re.Pattern, int]] = [
     ("REF_CATASTRAL", re.compile(r'\b\d{7}[A-Z]{2}\d{4}[A-Z]\d{4}[A-Z]{2}\b'), 0),
     # 9 digits starting with 6-9, any grouping: 612 345 678, 699 88 77 66, +34 612345678
     ("TELEFONO", re.compile(r'(?<!\d)(?:\+34[ -]?)?[6789](?:[ -]?\d){8}(?!\d)'), 0),
+    # Spanish addresses: street type (also abbreviated, and in Galician, Catalan and Basque), name,
+    # number (or s/n) and optional floor/door: "trav. Arteixo 335 3F", "Rúa Nova 12, 2º izda", "C/ Mayor s/n"
     ("DIRECCION", re.compile(
-        r'\b(?:calle|c/|avenida|avda\.?|plaza|pza\.?|paseo|camino|carretera|ronda|travesía|urbanización)'
-        r'\s+[A-ZÁÉÍÓÚÑa-záéíóúñü0-9 .\'-]{2,60}?,?\s*(?:n[º°o]\.?\s*|número\s*)?\d{1,4}'
-        r'(?:\s*,?\s*\d{1,2}[º°]?(?:\s*(?:izquierda|derecha|izda\.?|dcha\.?|[A-Z])\b)?)?',
+        r'\b(?:calle|c/|c\.|cl\.|carrer|kalea|rúa|rua|avenida|avda\.?|av\.|avinguda|plaza|plaça|praza|pza\.?|plza\.?|'
+        r'paseo|pº|ps\.|passeig|camino|camí|carretera|ctra\.?|estrada|ronda|rda\.|travesía|travesia|travessera|trav\.?|'
+        r'urbanización|urbanizacion|urb\.|glorieta|bulevar|callejón|callejon|pasaje|pje\.)'
+        r'\s*[A-ZÁÉÍÓÚÑa-záéíóúñüºª0-9 .\'-]{2,60}?,?\s*'
+        r'(?:n[º°o]\.?\s*|número\s*|núm\.?\s*|num\.?\s*)?(?:\d{1,4}(?:[A-Za-z]\b)?|s/n)'
+        r'(?:\s*[,-]?\s*(?:\d{1,2}\s*[º°ªo]?\s*-?\s*[A-Za-z]{1,2}\b|\d{1,2}\s*[º°ª]|bajo|ático|atico|entresuelo|'
+        r'principal|izquierda|derecha|izda\.?|dcha\.?|puerta\s+\w+|pta\.?\s*\w+|portal\s+\w+|esc(?:alera)?\.?\s*\w+)){0,3}',
         re.IGNORECASE), 0),
     ("PROTOCOLO", re.compile(r'\bprotocolo\b\D{0,15}?(\d(?:[\d.]*\d)?)', re.IGNORECASE), 1),
     # Notarial formulas: "DOÑA ROSARIO PÉREZ GÓMEZ", "D. Juan López de la Fuente"
@@ -45,6 +51,12 @@ NOT_NAMES = {
     "notario", "notaria", "testador", "testadora", "código", "civil", "dios", "ilustre", "colegio",
     "don", "doña", "registro", "estado", "ley", "artículo", "testamento", "señor", "señora", "doy", "fe",
     "sr", "sra", "dña", "dª", "nombra", "lega", "instituye", "dispone", "comparece", "otorga", "revoca",
+    # Short answers to the questionnaire ("Viuda" alone was tagged as a person)
+    "viudo", "viuda", "casado", "casada", "soltero", "soltera", "separado", "separada", "divorciado",
+    "divorciada", "pareja", "gananciales", "hijo", "hija", "hijos", "hijas", "nieto", "nieta", "nietos",
+    "padre", "madre", "padres", "hermano", "hermana", "sobrino", "sobrina", "marido", "mujer", "esposo",
+    "esposa", "sí", "si", "no", "vale", "gracias", "ninguno", "ninguna", "nadie", "todos", "ambos",
+    "albacea", "heredero", "heredera", "herederos", "usufructo", "mejora", "legítima", "notaría", "casa",
 }
 
 HONORIFIC_PREFIX = re.compile(r'^(?:D\.ª|Dª|D\.|Dña\.?|Sra?\.|DON|DOÑA|Don|Doña)\s+')
@@ -65,8 +77,23 @@ def _normalize(text: str) -> str:
     return re.sub(r'\s+', ' ', text).strip().lower()
 
 
+def _questionnaire_answer_words() -> set:
+    """Every word of the quick-answer options of the questionnaire ("Separación de bienes"...)."""
+    try:
+        from src.borrador.cuestionario import SECCIONES
+    except ImportError:
+        return set()
+    words = set()
+    for _, _, preguntas in SECCIONES:
+        for pregunta in preguntas:
+            match = re.search(r'\(Opciones: ([^)]+)\)', pregunta)
+            if match:
+                words.update(w for w in re.findall(r'\w+', match.group(1)) if len(w) > 2)
+    return words
+
+
 # Compare without accents, like every other value ("Dña" -> "dna")
-NOT_NAMES = {_normalize(word) for word in NOT_NAMES}
+NOT_NAMES = {_normalize(word) for word in NOT_NAMES | _questionnaire_answer_words()}
 
 
 def _name_tokens(name: str) -> set:

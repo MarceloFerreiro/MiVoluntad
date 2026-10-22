@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<title>Política de Privacidad · Mi Voluntad</title>
+<style>
+  :root { --text: #2b2118; --muted: #7a6a58; --accent: #7b4f27; --bg: #fffdf9; --soft: #f5ede1; --warn: #fff8e1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { color: var(--accent); font-size: 28px; margin: 8px 0 4px; }
+  h2 { font-size: 20px; margin: 28px 0 8px; }
+  .draft { background: var(--warn); border: 1px solid #f0dca0; border-radius: 12px; padding: 12px 16px; font-size: 16px; }
+  .muted { color: var(--muted); font-size: 15px; }
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid #e2e6e2; }
+  th { width: 34%; background: var(--soft); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <p class="draft"><b>Borrador para el prototipo del datathon.</b> Este texto debe revisarlo un jurista o el
+  delegado de protección de datos antes de usar el servicio con personas reales. Los campos entre corchetes están por completar.</p>
+
+  <p><img src="/assets/logo.png" alt="" width="64" height="64"></p>
+  <h1>Política de Privacidad</h1>
+  <p class="muted">Mi Voluntad · asistente para preparar un borrador orientativo de testamento</p>
+
+  <h2>Resumen</h2>
+  <ul>
+    <li>Sus datos se usan <b>solo</b> para ayudarle a preparar el borrador de su testamento.</li>
+    <li>Antes de consultar a la inteligencia artificial, sus <b>nombres, DNI, direcciones y cuentas se sustituyen por etiquetas</b>
+      ([PERSONA_1], [DNI_1]…). La IA nunca ve sus datos reales.</li>
+    <li>Las fotos de documentos se leen <b>en nuestro propio equipo</b>, no se envían a terceros.</li>
+    <li>Su conversación se guarda <b>cifrada con una clave que solo tiene su dispositivo</b>.</li>
+    <li>Puede <b>borrarlo todo cuando quiera</b> con el botón «Borrar mis datos». Si no, se borra solo a los <b>30 días sin uso</b>.</li>
+  </ul>
+
+  <h2>Responsable del tratamiento</h2>
+  <p>[Nombre de la entidad o del equipo], [dirección], [correo de contacto]. Delegado de protección de datos: [contacto, si lo hay].</p>
+
+  <h2>Qué datos tratamos y para qué</h2>
+  <table>
+    <tr><th>Datos</th><td>Lo que usted escriba en la conversación (situación familiar, deseos sobre su herencia, bienes) y,
+      si las envía, fotos de documentos. Pueden incluir datos de otras personas (familiares, herederos).</td></tr>
+    <tr><th>Finalidad</th><td>Orientarle sobre el testamento, preparar un borrador en PDF para llevar al notario e
+      indicarle notarías o el Colegio Notarial de su zona.</td></tr>
+    <tr><th>Base jurídica</th><td>Su consentimiento (art. 6.1.a RGPD), que da al pulsar «Acepto» y puede retirar en cualquier
+      momento borrando sus datos. Si menciona datos de salud u otras categorías especiales (por ejemplo, al hablar de tutela o
+      dependencia), su consentimiento explícito (art. 9.2.a RGPD).</td></tr>
+    <tr><th>Datos de terceros</th><td>Si menciona a otras personas, le pedimos que solo cuente lo necesario para el borrador.
+      Sus datos reciben la misma protección (se ocultan ante la IA y se borran con la conversación).</td></tr>
+  </table>
+
+  <h2>Cómo protegemos sus datos</h2>
+  <ul>
+    <li><b>Seudonimización</b> (art. 4.5 y 32 RGPD): los datos identificativos se sustituyen por etiquetas en nuestro equipo
+      antes de enviar el texto al modelo de IA. La tabla que relaciona etiquetas y datos reales nunca sale de nuestro servidor.</li>
+    <li><b>Cifrado</b>: la conversación y esa tabla se guardan cifradas (AES-256-GCM). La clave se genera al empezar, se entrega
+      solo a su navegador y no se guarda en el servidor: sin su dispositivo no se pueden leer.</li>
+    <li><b>Lectura local de documentos</b>: el reconocimiento de texto (OCR) de las fotos se hace en nuestro equipo.</li>
+    <li><b>Minimización</b>: no pedimos su nombre, DNI ni dirección exacta; eso se lo pedirá el notario.</li>
+  </ul>
+
+  <h2>Quién más interviene (encargados y terceros)</h2>
+  <table>
+    <tr><th>Anthropic (modelo de IA Claude)</th><td>Recibe el texto <b>seudonimizado</b> para generar las respuestas.
+      [Completar: contrato de encargado del tratamiento, ubicación y garantías de transferencia internacional (cláusulas
+      contractuales tipo / Marco de Privacidad de Datos UE-EE. UU.) y política de conservación del proveedor.]</td></tr>
+    <tr><th>OpenStreetMap (Nominatim)</th><td>Solo si pide notarías: recibe únicamente el nombre del municipio para situarlo
+      en el mapa, sin ningún dato personal.</td></tr>
+    <tr><th>Google Maps (opcional)</th><td>Solo si está activado y pide notarías: recibe únicamente el nombre del municipio.</td></tr>
+  </table>
+
+  <h2>Cuánto tiempo los guardamos</h2>
+  <p>Hasta que usted los borre o, como máximo, <b>30 días desde su último uso</b>; después se eliminan automáticamente
+  del servidor y de su navegador. El PDF del borrador no se guarda en el servidor: se genera y se le descarga.</p>
+
+  <h2>Inteligencia artificial</h2>
+  <p>Está conversando con un sistema de inteligencia artificial, no con una persona (art. 50 del Reglamento (UE) 2024/1689).
+  Sus respuestas son orientativas y pueden contener errores. No se toma ninguna decisión automatizada con efectos jurídicos
+  sobre usted (art. 22 RGPD): el borrador no tiene validez legal y debe revisarlo y formalizarlo un notario.</p>
+
+  <h2>Sus derechos</h2>
+  <p>Puede acceder a sus datos, rectificarlos, suprimirlos, oponerse, limitar su tratamiento, pedir su portabilidad y retirar
+  su consentimiento (arts. 15 a 22 RGPD). La forma más rápida de suprimirlos es el botón «Borrar mis datos». Para lo demás,
+  escriba a [correo de contacto]. Si considera que no hemos tratado bien sus datos, puede reclamar ante la Agencia Española
+  de Protección de Datos (<a href="https://www.aepd.es" target="_blank">www.aepd.es</a>).</p>
+
+  <p class="muted">Última actualización: [fecha]. <a href="/">Volver al asistente</a></p>
+</main>
+</body>
+</html>

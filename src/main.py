@@ -215,11 +215,11 @@ def main():
 
     console.print(Panel.fit(
         system_info,
-        title="Testamento Fácil",
+        title="Mi Voluntad",
         border_style="green"
     ))
 
-    console.print(titulo_ascii, style="rgb(46,125,90)")
+    console.print(titulo_ascii, style="rgb(123,79,39)")
 
     console.print("\n[dim]Comandos especiales:[/dim]")
     console.print("[dim]  - 'salir' → Salir del programa[/dim]")

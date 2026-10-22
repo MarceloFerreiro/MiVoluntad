@@ -1,16 +1,27 @@
 """Loader for folders of plain documents: law manuals and testament models."""
+import re
+import subprocess
+import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Tuple
 
 from pypdf import PdfReader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 TEXT_EXTENSIONS = {".txt", ".md"}
+WORD_EXTENSIONS = {".doc", ".docx", ".odt"}
+SUPPORTED = TEXT_EXTENSIONS | WORD_EXTENSIONS | {".pdf"}
+# Page markers written by the OCR step (src/preprocessing/ocr.py)
+PAGE_MARKER = re.compile(r'^--- Página (\d+) ---$', re.MULTILINE)
 
 
 class TextFolderLoader:
-    """Splits every .txt, .md and text PDF of a folder into chunks tagged with their kind of source."""
+    """Splits every .txt, .md, Word document and text PDF of a folder into chunks tagged with their kind of source.
+
+    Chunks never cross pages when the page is known (PDFs and OCR text with page markers),
+    so every chunk can be cited with its page.
+    """
 
     def __init__(
         self,
@@ -40,14 +51,32 @@ class TextFolderLoader:
         from src.utils.rich_utils import get_console
         self.console = get_console()
 
-    def _read(self, path: Path) -> str:
-        if path.suffix.lower() == ".pdf":
-            text = "\n".join(page.extract_text() or "" for page in PdfReader(str(path)).pages)
-            if len(text.strip()) < 50:
+    def _word_to_text(self, path: Path) -> str:
+        """Convert .doc/.docx/.odt to plain text with LibreOffice (headless)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(
+                ["soffice", "--headless", "--convert-to", "txt:Text (encoded):UTF8", "--outdir", tmp, str(path)],
+                check=True, capture_output=True, timeout=120,
+            )
+            return (Path(tmp) / f"{path.stem}.txt").read_text(encoding="utf-8", errors="replace")
+
+    def _read_pages(self, path: Path) -> List[Tuple[Optional[int], str]]:
+        """(page number or None, text) for every page of the document."""
+        suffix = path.suffix.lower()
+        if suffix == ".pdf":
+            pages = [(n, page.extract_text() or "") for n, page in enumerate(PdfReader(str(path)).pages, 1)]
+            if sum(len(text.strip()) for _, text in pages) < 50:
                 self.log(f"[yellow]{path.name} parece escaneado (sin texto). "
-                         f"Pase sus páginas como fotos a ocr/ para extraerlas.[/yellow]")
-            return text
-        return path.read_text(encoding="utf-8")
+                         f"Póngalo en ocr/ para extraer su texto a manuales/.[/yellow]")
+            return pages
+        text = self._word_to_text(path) if suffix in WORD_EXTENSIONS else path.read_text(encoding="utf-8")
+        markers = list(PAGE_MARKER.finditer(text))
+        if not markers:
+            return [(None, text)]
+        return [
+            (int(m.group(1)), text[m.end():markers[i + 1].start() if i + 1 < len(markers) else len(text)])
+            for i, m in enumerate(markers)
+        ]
 
     def load(self) -> List[Document]:
         """Load all documents of the folder as chunks.
@@ -58,21 +87,21 @@ class TextFolderLoader:
         if not self.folder.exists():
             return []
 
-        files = sorted(
-            p for p in self.folder.iterdir()
-            if p.is_file() and (p.suffix.lower() in TEXT_EXTENSIONS or p.suffix.lower() == ".pdf")
-        )
+        files = sorted(p for p in self.folder.iterdir() if p.is_file() and p.suffix.lower() in SUPPORTED)
         documents = []
         for path in files:
-            text = self._read(path)
-            if not text.strip():
-                continue
-            header = f"{self.description} ({path.name})\n"
-            for n, part in enumerate(self.splitter.split_text(text), 1):
-                documents.append(Document(
-                    page_content=header + part,
-                    metadata={"source": path.name, "fuente": self.fuente, "parte": n},
-                ))
+            n = 0
+            for page, text in self._read_pages(path):
+                if not text.strip():
+                    continue
+                where = f", página {page}" if page else ""
+                header = f"{self.description} ({path.name}{where})\n"
+                for part in self.splitter.split_text(text):
+                    n += 1
+                    documents.append(Document(
+                        page_content=header + part,
+                        metadata={"source": path.name, "fuente": self.fuente, "pagina": page, "parte": n},
+                    ))
 
         if self.verbose:
             self.log(f"[green]✓ {self.folder}/: {len(files)} archivos, {len(documents)} fragmentos[/green]")

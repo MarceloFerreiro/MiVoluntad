@@ -7,15 +7,17 @@ LEVELS = ("libro", "titulo", "capitulo", "seccion")
 def source_label(metadata: Dict) -> str:
     """Short name of where a chunk comes from, e.g. 'Código Civil, art. 695' or 'Manual: tema3.txt'."""
     fuente = metadata.get("fuente")
+    page = f", pág. {metadata['pagina']}" if metadata.get("pagina") else ""
     if fuente == "manual":
-        return f"Manual: {metadata.get('source', '?')}"
+        return f"Manual: {metadata.get('source', '?')}{page}"
     if fuente == "modelo":
-        return f"Modelo de testamento: {metadata.get('source', '?')}"
+        return f"Modelo de testamento: {metadata.get('source', '?')}{page}"
     norma = metadata.get("norma", "Código Civil")
     articulo = metadata.get("articulo")
     if not articulo:
         return norma
-    return f"{norma}, {articulo}" if articulo.startswith("Disposición") else f"{norma}, art. {articulo}"
+    named = articulo.startswith(("Disposición", "Número", "Considerando", "ANEXO"))
+    return f"{norma}, {articulo}" if named else f"{norma}, art. {articulo}"
 
 
 def source_detail(metadata: Dict) -> str:

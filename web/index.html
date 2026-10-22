@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Testamento Fácil</title>
+<title>Mi Voluntad</title>
+<link rel="icon" type="image/png" href="/assets/favicon.png">
 <style>
   :root {
-    --bg: #ffffff;
-    --sidebar: #f4f6f4;
-    --border: #e2e6e2;
-    --text: #1f2421;
-    --muted: #6b736d;
-    --accent: #2e7d5a;
-    --accent-soft: #e6f2ec;
-    --user-bubble: #2e7d5a;
+    --bg: #fffdf9;
+    /* Mi Voluntad: marrones de la pluma y tonos pergamino del logo */
+    --sidebar: #f5ede1;
+    --border: #e4d6c1;
+    --text: #2b2118;
+    --muted: #7a6a58;
+    --accent: #7b4f27;
+    --accent-soft: #f1e4d1;
+    --user-bubble: #7b4f27;
     --user-text: #ffffff;
-    --assistant-bubble: #f4f6f4;
+    --assistant-bubble: #f5ede1;
     --error: #b3261e;
     --error-soft: #fbe9e7;
   }
@@ -41,7 +43,8 @@
     flex-direction: column;
     height: 100%;
   }
-  .brand { padding: 18px 16px 8px; font-weight: 700; font-size: 20px; color: var(--accent); }
+  .brand { padding: 14px 16px 8px; font-weight: 700; font-size: 21px; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+  .logo-big { display: block; margin: 0 auto 16px; }
   .new-chat {
     margin: 8px 12px 12px;
     padding: 10px 12px;
@@ -62,7 +65,7 @@
     cursor: pointer;
     font-size: 15px;
   }
-  .conv:hover { background: #e9ede9; }
+  .conv:hover { background: #eee3d3; }
   .conv.active { background: var(--accent-soft); }
   .conv .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .conv .del {
@@ -76,6 +79,22 @@
   .conv:hover .del { visibility: visible; }
   .conv .del:hover { color: var(--error); }
   .sidebar-foot { padding: 12px 16px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--border); }
+  .model-pick { display: block; margin-bottom: 10px; color: var(--text); font-size: 14px; }
+  .model-pick select { display: block; width: 100%; margin-top: 4px; padding: 6px; font: inherit; font-size: 15px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .model-pick small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+  .sidebar-foot button { margin-top: 8px; width: 100%; border: 1px solid var(--border); background: var(--bg);
+    border-radius: 8px; padding: 6px; font-size: 14px; color: var(--error); }
+  .actions { display: flex; gap: 8px; }
+  .action { border: 1px solid var(--border); background: var(--bg); border-radius: 10px; padding: 6px 12px; font-size: 15px; }
+  .action:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+  .action.danger:hover:not(:disabled) { border-color: var(--error); background: var(--error-soft); }
+  .action:disabled { opacity: 0.4; cursor: not-allowed; }
+  .consent { text-align: left; max-width: 640px; margin: 0 auto; background: var(--sidebar); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 22px; }
+  .consent p { margin: 0 0 10px; }
+  .consent .buttons { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; }
+  .consent a { color: var(--accent); }
 
   /* Main */
   main { flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; }
@@ -114,7 +133,7 @@
   .bubble ul, .bubble ol { margin: 0 0 10px; padding-left: 24px; }
   .bubble li { margin: 3px 0; }
   .bubble hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-  .bubble code { background: #e9ede9; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .bubble code { background: #eee3d3; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
 
   .meta { margin-top: 8px; font-size: 14px; color: var(--muted); }
   .meta summary { cursor: pointer; }
@@ -132,9 +151,42 @@
   .attach-preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
   .attach-preview .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .attach-preview button { border: none; background: none; color: var(--muted); font-size: 18px; }
-  .attach { border: none; background: none; font-size: 22px; padding: 6px 4px; color: var(--muted); }
+  .attach { border: 1px solid var(--border); background: var(--bg); font-size: 15px; padding: 8px 10px; border-radius: 10px; color: var(--muted); }
   .attach:hover { color: var(--accent); }
+  .attach.recording { background: var(--error); border-color: var(--error); color: #fff; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity: 0.7; } }
+  .listen-btn {
+    align-self: flex-start; margin-top: 4px; border: 1px solid var(--border); background: var(--bg); color: var(--accent);
+    border-radius: 999px; padding: 4px 12px; font-size: 15px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .listen-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .attach:disabled { opacity: 0.35; cursor: not-allowed; }
+  /* Ver lo que vio la IA (texto enmascarado) */
+  .bubble-wrap { display: flex; flex-direction: column; max-width: 85%; }
+  .msg.user .bubble-wrap { align-items: flex-end; }
+  .bubble-wrap .bubble { max-width: 100%; }
+  .mask-btn {
+    align-self: flex-start; margin-top: 4px; border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    border-radius: 999px; padding: 2px 10px; font-size: 13px; opacity: 0; transition: opacity 0.15s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .msg.user .mask-btn { align-self: flex-end; }
+  .msg:hover .mask-btn, .mask-btn:focus, .mask-btn[aria-expanded="true"] { opacity: 1; }
+  @media (hover: none) { .mask-btn { opacity: 0.6; } }
+  .mask-panel {
+    margin-top: 6px; padding: 8px 12px; background: #fff8e1; border: 1px solid #f0dca0; border-radius: 10px;
+    font-size: 14px; color: var(--text); max-width: 100%;
+  }
+  .mask-panel .head { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .mask-panel pre { white-space: pre-wrap; font-family: inherit; margin: 0; max-height: 300px; overflow-y: auto; }
+  /* Respuestas rápidas */
+  .options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .option {
+    border: 2px solid var(--accent); background: var(--bg); color: var(--accent); border-radius: 12px;
+    padding: 10px 18px; font-size: 18px; font-weight: 600;
+  }
+  .option:hover { background: var(--accent-soft); }
   .retry { margin-top: 8px; border: 1px solid var(--error); color: var(--error); background: none; border-radius: 8px; padding: 4px 10px; font-size: 15px; }
 
   .typing span {
@@ -178,14 +230,17 @@
     border: none; background: var(--accent); color: #fff;
     border-radius: 12px; padding: 10px 18px; font-weight: 600;
   }
-  .send:disabled { background: #a9c7b8; cursor: not-allowed; }
+  .send:disabled { background: #c9b49a; cursor: not-allowed; }
   .disclaimer { max-width: 780px; margin: 8px auto 0; text-align: center; font-size: 13px; color: var(--muted); }
 
+  .action .short { display: none; }
   @media (max-width: 760px) {
+    .action .label { display: none; }
+    .action .short { display: inline; }
     aside { position: fixed; z-index: 10; left: -290px; transition: left 0.2s; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
     aside.open { left: 0; }
     header .menu { display: block; }
-    .bubble { max-width: 92%; }
+    .bubble, .bubble-wrap { max-width: 92%; }
     .avatar { display: none; }
   }
 </style>
@@ -193,16 +248,27 @@
 <body>
 
 <aside id="sidebar">
-  <div class="brand">⚖️ Testamento Fácil</div>
+  <div class="brand"><img src="/assets/logo.png" alt="" width="40" height="40"> Mi Voluntad</div>
   <button class="new-chat" id="newChat">＋ Nueva conversación</button>
   <div class="conv-list" id="convList"></div>
-  <div class="sidebar-foot">Las conversaciones se guardan solo en este navegador.</div>
+  <div class="sidebar-foot">
+    <label class="model-pick">Modelo de IA
+      <select id="modelSelect"></select>
+      <small id="modelDetail"></small>
+    </label>
+    <span id="retentionNote">Las conversaciones se guardan cifradas y se borran solas a los 30 días sin uso.</span>
+    <button id="deleteAll">Borrar todas mis conversaciones</button>
+  </div>
 </aside>
 
 <main>
   <header>
     <button class="menu" id="menuBtn" aria-label="Abrir conversaciones">☰</button>
     <h1 id="convTitle">Nueva conversación</h1>
+    <div class="actions">
+      <button class="action" id="pdfBtn" title="Descargar un PDF con sus respuestas para enseñárselo al notario"><span class="label">Generar borrador</span><span class="short">PDF</span></button>
+      <button class="action danger" id="deleteBtn" title="Borrar esta conversación y sus datos del servidor"><span class="label">Borrar mis datos</span><span class="short">Borrar</span></button>
+    </div>
     <span class="badge"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
   </header>
 
@@ -215,23 +281,85 @@
       <button type="button" id="attachRemove" title="Quitar foto">✕</button>
     </div>
     <form id="form">
-      <button type="button" class="attach" id="attachBtn" title="Adjuntar foto de un documento (por ejemplo, su testamento)">📎</button>
+      <button type="button" class="attach" id="attachBtn" title="Adjuntar foto de un documento (por ejemplo, su testamento)">Foto</button>
       <input type="file" id="fileInput" accept="image/*" hidden>
+      <button type="button" class="attach" id="micBtn" title="Hablar en lugar de escribir">Hablar</button>
       <textarea id="input" rows="1" placeholder="Escriba aquí su pregunta…" autocomplete="off"></textarea>
       <button class="send" id="send" type="submit">Enviar</button>
     </form>
-    <div class="disclaimer">Orientación general basada en el Código Civil. No sustituye el consejo de un notario o abogado. Las fotos se leen en este equipo y a la IA solo le llegan los datos personales ocultos.</div>
+    <div class="disclaimer">Borrador orientativo, sin validez legal: no sustituye al notario ni a un abogado. A la IA solo le llegan sus datos personales ocultos. <a href="/privacidad" target="_blank">Política de privacidad</a></div>
   </div>
 </main>
 
 <script>
-const STORAGE_KEY = "testamento_facil_conversaciones_v1";
+// v2: el historial enmascarado y la tabla de correspondencia viven cifrados en el servidor.
+// Aquí solo se guarda lo que se ve en pantalla y la clave de cada conversación.
+const STORAGE_KEY = "testamento_facil_conversaciones_v2";
+try { localStorage.removeItem("testamento_facil_conversaciones_v1"); } catch (e) { /* versión antigua, sin cifrar */ }
 const SUGGESTIONS = [
-  "Quiero hacer mi testamento y no sé por dónde empezar",
+  "Quiero empezar el cuestionario para mi borrador de testamento",
   "¿Qué tipos de testamento hay?",
-  "¿Puedo dejarle más a uno de mis hijos?",
-  "¿Qué tengo que llevar a la notaría?",
+  "¿Cuánto cuesta hacer testamento en el notario?",
+  "¿Hay alguna notaría cerca de donde vivo?",
 ];
+let config = { bienvenida: "", retention_days: 30 };
+// Modo desarrollador (?dev en la URL): muestra fragmentos consultados, coste y memoria
+const DEV = new URLSearchParams(location.search).has("dev");
+const MODEL_KEY = "mi_voluntad_modelo";
+function selectedModel() {
+  return $("modelSelect").value || config.modelo_por_defecto || "rapido";
+}
+function setupModelPicker() {
+  const select = $("modelSelect");
+  let saved = null;
+  try { saved = localStorage.getItem(MODEL_KEY); } catch (e) { /* sin almacenamiento */ }
+  select.innerHTML = "";
+  for (const m of config.modelos || []) {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = m.nombre;
+    opt.dataset.detalle = m.detalle;
+    select.appendChild(opt);
+  }
+  select.value = (config.modelos || []).some((m) => m.id === saved) ? saved : config.modelo_por_defecto;
+  const showDetail = () => { $("modelDetail").textContent = select.selectedOptions[0]?.dataset.detalle || ""; };
+  showDetail();
+  select.onchange = () => {
+    try { localStorage.setItem(MODEL_KEY, select.value); } catch (e) { /* sin almacenamiento */ }
+    showDetail();
+  };
+}
+const EYE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+// Separa la línea final "Opciones: A / B" de la respuesta para mostrarla como botones
+function splitOptions(text) {
+  const m = (text || "").match(/\n?\s*Opciones:\s*([^\n]+)\s*$/);
+  if (!m) return { text, options: [] };
+  const options = m[1].split("/").map((o) => o.trim().replace(/[.*]+$/, "")).filter(Boolean);
+  return { text: text.slice(0, m.index).trimEnd(), options };
+}
+
+// Botón (al pasar el ratón) que despliega el texto exacto que recibió o escribió la IA
+function maskToggle(maskedText, summary) {
+  const frag = document.createDocumentFragment();
+  const btn = document.createElement("button");
+  btn.className = "mask-btn";
+  btn.type = "button";
+  btn.setAttribute("aria-expanded", "false");
+  btn.innerHTML = EYE + "<span>Ver lo que vio la IA</span>";
+  const panel = document.createElement("div");
+  panel.className = "mask-panel";
+  panel.hidden = true;
+  panel.innerHTML = `<div class="head"></div><pre></pre>`;
+  panel.querySelector(".head").textContent = summary;
+  panel.querySelector("pre").textContent = maskedText;
+  btn.addEventListener("click", () => {
+    panel.hidden = !panel.hidden;
+    btn.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+  frag.append(btn, panel);
+  return frag;
+}
 const MAX_IMAGE_SIDE = 2400;
 const PRIVACY_NAMES = {
   PERSONA: "personas", DNI: "DNI", NIE: "NIE", IBAN: "cuentas", TELEFONO: "teléfonos", EMAIL: "emails",
@@ -240,7 +368,7 @@ const PRIVACY_NAMES = {
 };
 
 // ---------- Estado ----------
-let conversations = loadConversations();   // { id: {id, title, createdAt, updatedAt, messages: []} }
+let conversations = loadConversations();   // { id: {id, serverId, key, title, createdAt, updatedAt, messages: []} }
 let currentId = null;                      // conversación abierta (null = pantalla de bienvenida)
 const pending = new Set();                 // ids de conversaciones esperando respuesta
 let attachment = null;                     // { name, dataUrl } de la foto pendiente de enviar
@@ -252,6 +380,23 @@ function loadConversations() {
   } catch (e) {
     return {};
   }
+}
+
+// Borrado automático también en este dispositivo: lo que lleva más de N días sin uso
+function purgeExpired() {
+  const limit = Date.now() - config.retention_days * 24 * 3600 * 1000;
+  const expired = Object.values(conversations).filter((c) => c.updatedAt < limit);
+  if (expired.length) deleteOnServer(expired.map((c) => c.serverId));
+  expired.forEach((c) => delete conversations[c.id]);
+  saveConversations();
+}
+
+function deleteOnServer(serverIds) {
+  return fetch("/api/borrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ conversation_ids: serverIds.filter(Boolean) }),
+  }).catch(() => { /* el servidor las borrará igualmente al caducar */ });
 }
 
 function saveConversations() {
@@ -268,23 +413,6 @@ function newId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-// Memoria que se envía al servidor: solo pares completos pregunta -> respuesta.
-// Los mensajes con error o marcados fuera de memoria no cuentan. Se envía la versión
-// enmascarada (llmContent) para que los datos personales no salgan en turnos posteriores.
-function buildHistory(conv) {
-  const turns = [];
-  const msgs = conv.messages;
-  for (let i = 0; i < msgs.length - 1; i++) {
-    const q = msgs[i], a = msgs[i + 1];
-    if (q.role === "user" && a.role === "assistant") {
-      if (a.inMemory !== false) {
-        turns.push({ question: q.llmContent ?? q.content, answer: a.llmContent ?? a.content });
-      }
-      i++;
-    }
-  }
-  return turns;
-}
 
 // ---------- Markdown mínimo ----------
 function escapeHtml(s) {
@@ -363,11 +491,25 @@ function renderThread() {
   $("convTitle").textContent = conv ? conv.title : "Nueva conversación";
 
   if (!conv) {
+    // Primer mensaje: naturaleza del servicio y consentimiento antes de poder escribir
     thread.innerHTML = `
       <div class="welcome">
-        <div class="logo">⚖️</div>
-        <h2>¿En qué le puedo ayudar?</h2>
-        <p>Le explico cómo hacer su testamento, paso a paso y con palabras sencillas. Cuando quiera, le preparo una nota para llevar al notario.</p>
+        <img class="logo-big" src="/assets/logo.png" alt="Mi Voluntad" width="112" height="112">
+        <div class="consent">
+          <div class="text"></div>
+          <div class="buttons">
+            <button class="send" id="acceptBtn">He leído y acepto. Empezar</button>
+            <a href="/privacidad" target="_blank">Leer la Política de Privacidad</a>
+          </div>
+        </div>
+      </div>`;
+    thread.querySelector(".consent .text").innerHTML = renderMarkdown(config.bienvenida || "Cargando…");
+    thread.querySelector("#acceptBtn").addEventListener("click", acceptAndStart);
+  } else if (!conv.messages.length) {
+    thread.innerHTML = `
+      <div class="welcome">
+        <h2>Gracias. ¿Por dónde empezamos?</h2>
+        <p>Puede empezar el cuestionario o preguntarme cualquier duda. Cuando tengamos lo básico, pulse <b>Generar borrador</b>.</p>
         <div class="chips"></div>
       </div>`;
     const chips = thread.querySelector(".chips");
@@ -383,7 +525,7 @@ function renderThread() {
     if (pending.has(conv.id)) {
       const typing = document.createElement("div");
       typing.className = "msg assistant";
-      typing.innerHTML = `<div class="avatar">⚖️</div><div class="bubble typing"><span></span><span></span><span></span></div>`;
+      typing.innerHTML = `<div class="avatar">TF</div><div class="bubble typing"><span></span><span></span><span></span></div>`;
       thread.appendChild(typing);
     }
   }
@@ -401,17 +543,21 @@ function renderMessage(m, conv, index) {
     if (m.attachment) {
       const line = document.createElement("div");
       line.className = "attachment-line";
-      line.textContent = "📄 " + m.attachment.name;
+      line.textContent = "Foto: " + m.attachment.name;
       bubble.appendChild(line);
     }
     bubble.appendChild(document.createTextNode(m.content));
-    row.appendChild(bubble);
+    const wrap = document.createElement("div");
+    wrap.className = "bubble-wrap";
+    wrap.appendChild(bubble);
+    if (m.maskedQuestion) wrap.appendChild(maskToggle(m.maskedQuestion, "Su mensaje tal como lo recibió la IA (datos personales ocultos)"));
+    row.appendChild(wrap);
     return row;
   }
 
   if (m.role === "error") {
     row.className = "msg assistant error";
-    row.innerHTML = `<div class="avatar">⚠️</div><div class="bubble"><div class="text"></div></div>`;
+    row.innerHTML = `<div class="avatar">!</div><div class="bubble"><div class="text"></div></div>`;
     row.querySelector(".text").textContent = m.content;
     const isLast = index === conv.messages.length - 1;
     if (isLast && !pending.has(conv.id)) {
@@ -425,26 +571,64 @@ function renderMessage(m, conv, index) {
   }
 
   row.className = "msg assistant";
-  row.innerHTML = `<div class="avatar">⚖️</div><div class="bubble"><div class="text"></div></div>`;
-  row.querySelector(".text").innerHTML = renderMarkdown(m.content);
+  row.innerHTML = `<div class="avatar">TF</div><div class="bubble-wrap"><div class="bubble"><div class="text"></div></div></div>`;
+  const { text, options } = splitOptions(m.content);
+  row.querySelector(".text").innerHTML = renderMarkdown(text);
+  const wrap = row.querySelector(".bubble-wrap");
 
-  if (m.document && m.document.masked_text) {
-    const priv = document.createElement("details");
-    priv.className = "meta";
-    const hidden = Object.entries(m.privacySummary || {})
-      .map(([type, n]) => `${n} ${PRIVACY_NAMES[type] || type}`).join(", ") || "ningún dato detectado";
-    priv.innerHTML = `<summary>🔒 Lo que vio la IA (datos ocultos: ${escapeHtml(hidden)}) · lectura ${m.document.confidence}%</summary><div class="privacy"><pre></pre></div>`;
-    priv.querySelector("pre").textContent = m.document.masked_text;
-    row.querySelector(".bubble").appendChild(priv);
+  // Respuestas rápidas: solo en el último mensaje de la conversación
+  const isLast = index === conv.messages.length - 1;
+  if (options.length && isLast && !pending.has(conv.id)) {
+    const box = document.createElement("div");
+    box.className = "options";
+    for (const o of options) {
+      const b = document.createElement("button");
+      b.className = "option";
+      b.textContent = o;
+      // "Generar borrador" como respuesta rápida: genera y descarga el PDF en vez de enviarlo
+      if (/generar\s+(el\s+)?borrador/i.test(o)) {
+        b.addEventListener("click", async () => {
+          b.disabled = true;
+          b.textContent = "Preparando el PDF…";
+          await downloadDraft();
+          b.disabled = false;
+          b.textContent = o;
+        });
+      } else {
+        b.addEventListener("click", () => send(o));
+      }
+      box.appendChild(b);
+    }
+    row.querySelector(".bubble").appendChild(box);
   }
 
+  const tools = document.createElement("div");
+  tools.className = "tools";
+  const listen = document.createElement("button");
+  listen.className = "listen-btn";
+  listen.type = "button";
+  listen.textContent = "Escuchar";
+  listen.addEventListener("click", () => speak(text + (options.length ? ". Puede responder: " + options.join(", ") : ""), listen));
+  tools.appendChild(listen);
+  wrap.appendChild(tools);
+
+  if (m.maskedAnswer) {
+    const hidden = Object.entries(m.privacySummary || {})
+      .map(([type, n]) => `${n} ${PRIVACY_NAMES[type] || type}`).join(", ");
+    const head = "Respuesta de la IA antes de poner sus datos reales" + (hidden ? ` (datos ocultos: ${hidden})` : "");
+    const toggle = maskToggle(splitOptions(m.maskedAnswer).text, head);
+    tools.appendChild(toggle.firstChild);   // botón junto a "Escuchar"
+    wrap.appendChild(toggle);               // panel debajo
+  }
+
+  if (!DEV) return row;
   const sources = m.sources || [];
   const details = document.createElement("details");
   details.className = "meta";
   const n = m.historyTurns ?? 0;
   const memory = `recordaba ${n} turno${n === 1 ? "" : "s"} anterior${n === 1 ? "" : "es"}`;
   const cost = typeof m.cost === "number" ? ` · $${m.cost.toFixed(5)}` : "";
-  details.innerHTML = `<summary>📚 ${sources.length ? sources.length + " fragmentos consultados" : "sin búsqueda en los documentos"} · 🧠 ${memory}${cost}</summary>`;
+  details.innerHTML = `<summary>${sources.length ? sources.length + " fragmentos consultados" : "sin búsqueda en los documentos"} · ${memory}${cost}</summary>`;
   for (const s of sources) {
     const div = document.createElement("div");
     div.className = "source";
@@ -454,18 +638,25 @@ function renderMessage(m, conv, index) {
     div.querySelector("pre").textContent = s.texto;
     details.appendChild(div);
   }
-  row.querySelector(".bubble").appendChild(details);
+  wrap.appendChild(details);
   return row;
 }
 
 function updateComposer() {
+  const conv = conversations[currentId];
   const busy = currentId !== null && pending.has(currentId);
-  $("send").disabled = busy;
-  $("attachBtn").disabled = busy || !ocrAvailable;
+  const hasAnswers = !!conv && conv.messages.some((m) => m.role === "assistant");
+  $("pdfBtn").disabled = !hasAnswers || busy || pdfBusy;
+  $("deleteBtn").disabled = !conv || busy;
+  $("input").disabled = !conv;
+  $("send").disabled = busy || !conv;
+  $("attachBtn").disabled = busy || !ocrAvailable || !conv;
+  $("micBtn").disabled = (busy || !conv) && !recorder;
   $("attachBtn").title = ocrAvailable
     ? "Adjuntar foto de un documento (por ejemplo, su testamento)"
     : "El OCR no está instalado en el servidor";
-  $("input").placeholder = busy ? "Esperando la respuesta…" : "Escriba aquí su pregunta…";
+  $("input").placeholder = !conv ? "Acepte la política de privacidad para empezar"
+    : busy ? "Esperando la respuesta…" : "Escriba aquí su pregunta…";
 }
 
 // ---------- Acciones ----------
@@ -482,6 +673,8 @@ function newConversation() {
 }
 
 function deleteConversation(id) {
+  const conv = conversations[id];
+  if (conv) deleteOnServer([conv.serverId]);
   delete conversations[id];
   saveConversations();
   if (currentId === id) currentId = null;
@@ -489,28 +682,70 @@ function deleteConversation(id) {
   renderThread();
 }
 
+// Acepta la política: el servidor crea la conversación cifrada y entrega su clave (solo esta vez)
+async function acceptAndStart() {
+  const btn = $("acceptBtn");
+  btn.disabled = true;
+  try {
+    const res = await fetch("/api/conversacion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ acepta_privacidad: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    const id = newId();
+    conversations[id] = {
+      id, serverId: data.conversation_id, key: data.key, title: "Nueva conversación",
+      createdAt: Date.now(), updatedAt: Date.now(), messages: [],
+    };
+    saveConversations();
+    openConversation(id);
+  } catch (e) {
+    btn.disabled = false;
+    alert("No se ha podido empezar: " + e.message);
+  }
+}
+
+let pdfBusy = false;
+async function downloadDraft() {
+  const conv = conversations[currentId];
+  if (!conv || pdfBusy) return;
+  pdfBusy = true;
+  const label = $("pdfBtn").querySelector(".label");
+  label.textContent = "Generando…";
+  updateComposer();
+  try {
+    const res = await fetch("/api/borrador", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversation_id: conv.serverId, key: conv.key, modelo: selectedModel() }),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Error ${res.status}`);
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "borrador_testamento.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch (e) {
+    alert("No se ha podido generar el borrador: " + e.message);
+  } finally {
+    pdfBusy = false;
+    label.textContent = "Generar borrador";
+    updateComposer();
+  }
+}
+
 async function send(text, photo = null) {
   text = text.trim();
   if (!text && !photo) return;
-  if (currentId !== null && pending.has(currentId)) return;
-
-  // Crear la conversación al enviar el primer mensaje
-  if (currentId === null || !conversations[currentId]) {
-    const id = newId();
-    conversations[id] = {
-      id,
-      title: text ? (text.length > 45 ? text.slice(0, 45) + "…" : text) : "📄 " + photo.name,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      messages: [],
-      privacyMap: {},
-    };
-    currentId = id;
-  }
-
   const conv = conversations[currentId];
-  // La memoria se calcula ANTES de añadir el mensaje nuevo
-  const history = buildHistory(conv);
+  if (!conv || pending.has(currentId)) return;
+  if (!conv.messages.length) conv.title = text ? (text.length > 45 ? text.slice(0, 45) + "…" : text) : "Foto: " + photo.name;
+
   const userMsg = { role: "user", content: text };
   if (photo) {
     userMsg.attachment = { name: photo.name };
@@ -519,10 +754,10 @@ async function send(text, photo = null) {
   conv.messages.push(userMsg);
   conv.updatedAt = Date.now();
   saveConversations();
-  await requestAnswer(conv.id, userMsg, history);
+  await requestAnswer(conv.id, userMsg);
 }
 
-async function requestAnswer(convId, userMsg, history) {
+async function requestAnswer(convId, userMsg) {
   pending.add(convId);
   renderSidebar();
   renderThread();
@@ -533,22 +768,20 @@ async function requestAnswer(convId, userMsg, history) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        conversation_id: conversations[convId]?.serverId,
+        key: conversations[convId]?.key,
+        modelo: selectedModel(),
         message: userMsg.content,
         image: userMsg.imageData || null,
-        history,
-        privacy_map: conversations[convId]?.privacyMap || {},
       }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-    // La memoria guarda la versión enmascarada; la pantalla, la restaurada
-    if (data.history_question) userMsg.llmContent = data.history_question;
-    if (data.privacy_map && conversations[convId]) conversations[convId].privacyMap = data.privacy_map;
+    if (data.masked_question) userMsg.maskedQuestion = data.masked_question;
     reply = {
       role: "assistant",
       content: data.answer,
-      llmContent: data.history_answer,
-      inMemory: data.in_memory !== false,
+      maskedAnswer: data.masked_answer,
       document: data.document,
       privacySummary: data.privacy_summary,
       sources: data.sources,
@@ -581,21 +814,25 @@ function retryLast(convId) {
   const last = conv.messages.at(-1);
   if (!last || last.role !== "user") return renderThread();
   if (last.attachment && !last.imageData) {
-    conv.messages.push({ role: "error", content: "La foto ya no está disponible tras recargar la página. Vuelva a adjuntarla con 📎." });
+    conv.messages.push({ role: "error", content: "La foto ya no está disponible tras recargar la página. Vuelva a adjuntarla con el botón Foto." });
     saveConversations();
     return renderThread();
   }
-  const history = buildHistory({ messages: conv.messages.slice(0, -1) });
-  requestAnswer(convId, last, history);
+  requestAnswer(convId, last);
 }
 
-async function checkHealth() {
+async function loadConfig() {
   try {
-    const res = await fetch("/api/health");
-    const data = await res.json();
-    setStatus(res.ok, data.model);
-    ocrAvailable = !!data.ocr;
-    updateComposer();
+    const res = await fetch("/api/config");
+    config = await res.json();
+    setStatus(res.ok, config.model);
+    ocrAvailable = !!config.ocr;
+    $("retentionNote").textContent =
+      `Las conversaciones se guardan cifradas y se borran solas a los ${config.retention_days} días sin uso.`;
+    setupModelPicker();
+    purgeExpired();
+    renderSidebar();
+    renderThread();
   } catch (e) {
     setStatus(false);
   }
@@ -659,6 +896,84 @@ function clearAttachment() {
 }
 
 $("attachBtn").addEventListener("click", () => $("fileInput").click());
+
+// ---------- Voz ----------
+// Leer en voz alta: voz en español del propio dispositivo (no se envía nada)
+let speakingBtn = null;
+function speak(text, btn) {
+  if (!("speechSynthesis" in window)) return alert("Este navegador no puede leer en voz alta.");
+  const wasThis = speakingBtn === btn && speechSynthesis.speaking;
+  speechSynthesis.cancel();
+  if (speakingBtn) speakingBtn.textContent = "Escuchar";
+  speakingBtn = null;
+  if (wasThis) return;
+  const u = new SpeechSynthesisUtterance(text.replace(/[*_#`]/g, ""));
+  u.lang = "es-ES";
+  u.rate = 0.95;
+  const voice = speechSynthesis.getVoices().find((v) => v.lang === "es-ES") || speechSynthesis.getVoices().find((v) => v.lang.startsWith("es"));
+  if (voice) u.voice = voice;
+  u.onend = u.onerror = () => { if (speakingBtn === btn) { btn.textContent = "Escuchar"; speakingBtn = null; } };
+  btn.textContent = "Parar";
+  speakingBtn = btn;
+  speechSynthesis.speak(u);
+}
+
+// Hablar: graba en el navegador y transcribe en nuestro servidor (Whisper local)
+let recorder = null, recordTimer = null;
+const MAX_RECORDING_MS = 60000;
+async function toggleRecording() {
+  const btn = $("micBtn");
+  if (recorder) { recorder.stop(); return; }
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    return alert("Para usar el micrófono, la página debe abrirse con https.\n" +
+                 "Pida a quien instaló el asistente la dirección que empieza por https://");
+  }
+  const conv = conversations[currentId];
+  if (!conv) return;
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    return alert("No se ha podido usar el micrófono. Revise que el navegador tiene permiso.");
+  }
+  const mime = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg"].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
+  const chunks = [];
+  recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+  recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  recorder.onstop = async () => {
+    clearTimeout(recordTimer);
+    stream.getTracks().forEach((t) => t.stop());
+    const type = recorder.mimeType || mime || "audio/webm";
+    recorder = null;
+    btn.classList.remove("recording");
+    btn.textContent = "Transcribiendo…";
+    btn.disabled = true;
+    try {
+      const blob = new Blob(chunks, { type });
+      const dataUrl = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
+      const res = await fetch("/api/transcribir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversation_id: conv.serverId, key: conv.key, audio: dataUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+      input.value = (input.value.trim() ? input.value.trim() + " " : "") + data.texto;
+      autosize();
+      input.focus();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      btn.textContent = "Hablar";
+      updateComposer();
+    }
+  };
+  recorder.start();
+  btn.classList.add("recording");
+  btn.textContent = "Escuchando… pulse para terminar";
+  recordTimer = setTimeout(() => recorder && recorder.stop(), MAX_RECORDING_MS);
+}
+$("micBtn").addEventListener("click", toggleRecording);
 $("attachRemove").addEventListener("click", clearAttachment);
 $("fileInput").addEventListener("change", async () => {
   const file = $("fileInput").files[0];
@@ -675,11 +990,28 @@ $("fileInput").addEventListener("change", async () => {
   }
 });
 $("newChat").addEventListener("click", newConversation);
+$("pdfBtn").addEventListener("click", downloadDraft);
+$("deleteBtn").addEventListener("click", () => {
+  const conv = conversations[currentId];
+  if (conv && confirm("¿Borrar esta conversación y todos sus datos? No se puede deshacer.")) deleteConversation(conv.id);
+});
+$("deleteAll").addEventListener("click", () => {
+  const all = Object.values(conversations);
+  if (!all.length || !confirm(`¿Borrar sus ${all.length} conversaciones y todos sus datos? No se puede deshacer.`)) return;
+  deleteOnServer(all.map((c) => c.serverId));
+  conversations = {};
+  saveConversations();
+  currentId = null;
+  renderSidebar();
+  renderThread();
+});
 $("menuBtn").addEventListener("click", () => $("sidebar").classList.toggle("open"));
 
+// Conversaciones de antes del cifrado (sin clave): no se pueden continuar
+for (const c of Object.values(conversations)) if (!c.serverId) delete conversations[c.id];
 renderSidebar();
 renderThread();
-checkHealth();
+loadConfig();
 </script>
 </body>
 </html>
