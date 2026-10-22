@@ -15,6 +15,12 @@
 | `modelos/modelo_testamento_olografo.doc` | Modelo orientativo de testamento ológrafo | — | 2 |
 | `docs/cuestionario/CUESTIONARIO.docx` | Cuestionario original del equipo (no se indexa) | Equipo | — |
 
+> **No están en el repositorio público** (derechos de autor): el libro escaneado y su texto
+> (`ocr/manual_el_testamento.pdf`, `manuales/manual_el_testamento.txt`) y los tres modelos de testamento
+> de `modelos/`. Están en `.gitignore`: hay que pedírselos al equipo y copiarlos en sus carpetas antes de
+> `python server.py --rebuild`. Sin ellos el asistente funciona igual, solo con las leyes.
+> El modelo estándar procede de la web de la Notaría Bosch-Bages (Barcelona).
+
 Total: **3.335 fragmentos**. Los dos reglamentos de la UE estaban en `manuales/` y se movieron a
 `pdfs/ue/` porque son normas y se trocean por artículo.
 

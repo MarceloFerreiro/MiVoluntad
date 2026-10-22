@@ -65,6 +65,6 @@ Los **documentos** de `pdfs/`, `manuales/`, `ocr/` y `modelos/` **no** están cu
 MIT: conservan sus propios derechos.
 
 - Las leyes (BOE y Diario Oficial de la UE) son textos oficiales de libre reutilización, citando la fuente.
-- El libro escaneado (`ocr/manual_el_testamento.pdf` y su texto en `manuales/`) y los modelos de testamento
-  de notarías están protegidos por derechos de autor. Se usan solo como material de consulta interno del
-  prototipo. Si el repositorio se hace público, hay que retirarlos o pedir permiso a sus autores.
+- El libro escaneado y su texto, y los modelos de testamento de notarías, están protegidos por derechos de
+  autor: **no se publican** en este repositorio (están en `.gitignore`). Se usan solo en local como material
+  de consulta interno del prototipo; ver [docs/DATOS.md](docs/DATOS.md).

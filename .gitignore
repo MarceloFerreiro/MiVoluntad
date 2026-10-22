@@ -7,3 +7,11 @@ local_vectorstore/
 vendor/
 data/
 certs/
+
+# Documentos con derechos de autor: solo en local, nunca en el repositorio público
+ocr/*
+!ocr/.gitkeep
+manuales/*
+!manuales/.gitkeep
+modelos/*
+!modelos/.gitkeep
