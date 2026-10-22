@@ -1,0 +1,206 @@
+CONVERSACIÓN DE PRUEBA — Testamento Fácil
+Fecha: 21/10/2026 · Modelo: claude-haiku-5-5 (effort low) · RAG: Código Civil (FAISS + BM25)
+Escenario: Hombre casado, tres hijos (uno fallecido con dos nietos), vive en Toledo.
+==========================================================================================
+
+[1] USUARIO:
+Hola, buenos días
+
+[1] ASISTENTE:
+Buenos días. Soy Testamento Fácil, y estoy aquí para ayudarle a entender cómo hacer su testamento, paso a paso y sin prisa.
+
+Un testamento es el documento en el que usted dice qué quiere que pase con sus bienes cuando ya no esté.
+
+Para empezar, ¿qué le gustaría saber? Por ejemplo, puedo explicarle los tipos de testamento o qué pasos seguir en la notaría.
+
+    (artículos recuperados: ninguno (sin búsqueda) · coste: $0.00037)
+------------------------------------------------------------------------------------------
+
+[2] USUARIO:
+Mi nieta me ha dicho que debería hacer testamento, pero no sé ni por dónde empezar
+
+[2] ASISTENTE:
+Entiendo que le dé vueltas al asunto. Es normal no saber por dónde empezar, y es buena idea dar este paso con calma.
+
+Empecemos por lo más sencillo: hay varias formas de hacer testamento, y la más habitual es ante notario. Le explico la idea general:
+
+1. Usted le dice al notario, de viva voz o por escrito, qué quiere dejar y a quién.
+2. El notario lo escribe, se lo lee en voz alta y, si está conforme, lo firma.
+3. Después, el notario lo comunica al Registro General de Actos de Última Voluntad, para que se encuentre cuando haga falta.
+
+Para que le sea más fácil preparar la visita, necesito saber un poco de su situación familiar. ¿Está casada o tiene pareja? ¿Tiene hijos?
+
+    (artículos recuperados: 709, 679, 675, 695, 718, 680, 13, 1790 · coste: $0.00075)
+------------------------------------------------------------------------------------------
+
+[3] USUARIO:
+Estoy casado con Carmen y tuvimos tres hijos: Luis, Ana y Pedro. Pedro murió hace dos años y dejó dos niños, Pablo y Lucía. Vivimos en Toledo.
+
+[3] ASISTENTE:
+Gracias por contarme su situación. Con estos datos ya puedo explicarle cómo funciona la herencia en su caso.
+
+1. **Carmen, su esposa**, es heredera forzosa. Eso significa que la ley le reserva una parte. Si usted fallece antes que ella, tendrá derecho al **usufructo** (el uso y disfrute de unos bienes, sin ser su dueña) del tercio de mejora (artículo 834 del Código Civil).
+
+2. **Luis, Ana y Pedro**: como hijos, son herederos forzosos y tienen derecho a una parte igual de la legítima, que es la parte mínima que la ley garantiza a los hijos.
+
+3. **Pablo y Lucía**, sus nietos, heredan la parte de su padre Pedro, que ya falleció. Lo reciben por "derecho de representación", es decir, ocupan el lugar de su padre, y si les corresponde algo, se reparte a partes iguales entre los dos (artículo 933 del Código Civil).
+
+Esto significa que Pedro no pierde su parte por haber muerto: pasa a sus hijos.
+
+Como orientación, Toledo está en Castilla-La Mancha, donde se aplica el Código Civil común. El notario le confirmará los detalles.
+
+¿Quiere que le explique cómo se reparte la herencia entre sus tres hijos con un ejemplo de cifras inventadas? ¿O prefiere primero contarme si tiene alguna idea sobre lo que le gustaría dejar a cada uno?
+
+    (artículos recuperados: 840, 807, 809, 857, 837, 933, 834, 838 · coste: $0.00160)
+------------------------------------------------------------------------------------------
+
+[4] USUARIO:
+Lo que más me preocupa es que Carmen pueda seguir viviendo en nuestra casa cuando yo falte
+
+[4] ASISTENTE:
+Sí, se puede asegurar que Carmen pueda seguir en la casa. Lo mejor es dejarlo escrito en el testamento.
+
+**Lo que la ley ya le da a Carmen**
+
+- Como usted está casado y no separado, Carmen tendría derecho al **usufructo** (uso y disfrute de por vida, sin ser la dueña) del tercio de mejora (artículo 834 del Código Civil).
+- Pero hay un problema: cuando el cónyuge viudo concurre con hijos del fallecido, **los hijos pueden elegir** pagarle ese usufructo con dinero o con un lote de bienes (artículo 840 del Código Civil). Es decir, podrían darle dinero en lugar de dejarla en la casa. Por eso, la ley sola no le garantiza vivir allí.
+
+**Lo que puede hacer en el testamento**
+
+Puede dejar la casa de forma expresa, por ejemplo:
+1. **Usufructo de la casa a Carmen de por vida**, y la propiedad a sus hijos y nietos. Así ella vive allí mientras quiera y, al fallecer, la casa pasa a ellos.
+2. **Derecho de habitación** a favor de Carmen, que le permite vivir en la vivienda sin poder alquilarla ni venderla (el título del derecho determina sus condiciones, artículo 523 del Código Civil).
+3. **La casa en propiedad para Carmen**, usando el tercio de libre disposición o parte del de mejora, si quiere que sea totalmente suya.
+
+**Algo que ya protege a Carmen en vida**
+
+Mientras estén casados, no se puede vender ni donar la vivienda habitual sin el consentimiento de los dos, aunque la casa esté solo a nombre de usted (artículo 1320 del Código Civil).
+
+**Dos datos que necesito para orientarle mejor**
+
+1. ¿Están casados en **régimen de gananciales**? Es el régimen normal si no firmaron capitulaciones matrimoniales (un acuerdo ante notario sobre sus bienes). En ese caso, al fallecer usted, Carmen puede quedarse con la vivienda donde vivía habitualmente dentro de su parte de los bienes comunes (artículo 1406, número 4, del Código Civil). Esto podría cambiar lo que tiene que dejar en el testamento.
+2. ¿La casa está a nombre de los dos, solo de usted o de otra forma?
+
+Cuando me responda, le explico cuál de estas opciones encaja mejor con su situación y qué preguntarle al notario.
+
+    (artículos recuperados: 822, 840, 837, 523, 838, 1320, 1406, 834 · coste: $0.00196)
+------------------------------------------------------------------------------------------
+
+[5] USUARIO:
+¿Qué tengo que llevar a la notaría? ¿Y cuánto me va a costar?
+
+[5] ASISTENTE:
+Con gusto le explico las dos cosas.
+
+**Qué llevar a la notaría**
+
+1. Su DNI (o documento de identidad en vigor).
+2. Los nombres completos de las personas a las que quiere dejar sus bienes: Carmen, Luis, Ana, Pablo y Lucía.
+3. Una idea general de lo que quiere dejar y cómo, aunque el notario le ayudará a concretarlo.
+4. Si tiene a mano, datos de la vivienda (por ejemplo, la escritura o el recibo del IBI), para que el notario sepa de qué bien se trata.
+
+Tenga en cuenta que no hacen falta testigos en un testamento abierto normal, salvo que usted o el notario lo pidan, o que usted declare que no sabe o no puede firmar (artículo 697 del Código Civil).
+
+**Cuánto cuesta**
+
+De forma orientativa, un testamento abierto sencillo cuesta unos 40 a 60 euros. Puede variar según la notaría y la complejidad. Le recomiendo preguntar el precio exacto al pedir la cita.
+
+**Cómo es la visita**
+
+El notario le escucha, redacta el testamento, se lo lee en voz alta y, si está conforme, lo firma. Suele ser una visita corta. Después, el notario lo comunica al Registro General de Actos de Última Voluntad.
+
+¿Quiere que le explique cómo pedir la cita, o prefiere que preparemos juntos la nota con sus datos para llevar a la notaría?
+
+    (artículos recuperados: 694, 697, 696, 698, 695, 700, 701, 721 · coste: $0.00103)
+------------------------------------------------------------------------------------------
+
+[6] USUARIO:
+¿Y si dentro de unos años cambio de opinión?
+
+[6] ASISTENTE:
+Sí, puede cambiar de opinión cuando quiera. La ley dice que los testamentos son **revocables**, es decir, se pueden anular. Aunque en un testamento ponga que no quiere cambiarlo, ese deseo no tiene efecto (artículo 737 del Código Civil).
+
+**Cómo cambiarlo:**
+
+1. Haga un testamento nuevo ante notario.
+2. En ese testamento nuevo, el anterior queda sin efecto. No hace falta destruir el antiguo, aunque el notario le puede aconsejar qué hacer con él (artículo 739 del Código Civil).
+3. Si no quiere que el anterior siga en vigor en ninguna parte, no tiene que decir nada especial. Basta con que el nuevo sea completo.
+
+**Lo que conviene saber:**
+
+- Tachar, corregir o escribir a mano encima del testamento no sirve. Para cambiarlo hay que hacerlo con las mismas formalidades que el original, es decir, ante notario (artículo 738 del Código Civil).
+- Si el nuevo testamento no llegara a valer, por ejemplo porque alguien renuncia a la herencia, el cambio de todos modos anula el anterior (artículo 740 del Código Civil).
+- El notario comunica cada testamento al Registro General de Actos de Última Voluntad. Así, lo que cuenta es siempre el último que haya hecho.
+
+Le recomiendo revisar el testamento cada vez que pase algo importante en la familia, como un nacimiento, una boda o un fallecimiento. Por ejemplo, si cambia algo sobre la casa, lo mejor es dejarlo claro en un testamento nuevo.
+
+¿Quiere que le explique qué pasaría si, en el futuro, Carmen falleciera antes que usted?
+
+    (artículos recuperados: 739, 740, 737, 738, 644, 741, 756, 743 · coste: $0.00121)
+------------------------------------------------------------------------------------------
+
+[7] USUARIO:
+Vale, hágame el borrador para llevarlo al notario
+
+[7] ASISTENTE:
+**Nota para llevar al notario (borrador)**
+
+**1. Datos de la persona**
+- Nombre y apellidos: *pendiente*
+- DNI: lo llevará a la cita
+- Residencia: Toledo (Castilla-La Mancha)
+
+**2. Situación familiar**
+- Estado civil: casado con Carmen, no separado.
+- Hijos: Luis, Ana y Pedro.
+- Pedro falleció hace dos años. Dejó dos hijos, Pablo y Lucía, que ocupan su lugar en la herencia.
+- Edad de Pablo y Lucía: *pendiente*
+
+**3. Qué quiere dejar y a quién**
+- **Carmen:** que pueda seguir viviendo en la casa familiar mientras viva.
+- **Casa:** *pendiente*. ¿Está a nombre de los dos? ¿Quiere dejarla a Carmen en propiedad o solo el derecho a vivir en ella?
+- **Resto de bienes:** *pendiente* (cuentas, otros inmuebles, objetos de valor, etc.).
+- **Luis, Ana, Pablo y Lucía:** *pendiente*, según lo que quiera repartir.
+
+**4. Otros deseos**
+- Albacea (persona que se encarga de cumplir el testamento): *pendiente*
+- Legados concretos (algún bien para alguien en particular): *pendiente*
+- Tutor para menores, si los hubiera: *pendiente*
+
+**5. Dudas para preguntar al notario**
+- ¿Cómo puedo asegurar que Carmen siga en la casa sin perjudicar las partes que la ley reserva a los hijos y nietos?
+- ¿Es mejor dejarle a Carmen el uso de la casa de por vida o asignársela en propiedad?
+- ¿Cómo afecta a Pablo y Lucía la parte que habría correspondido a su padre Pedro?
+- ¿Qué parte de mis bienes puedo decidir libremente?
+
+*Nota: si quiere dejar la casa solo a Carmen en propiedad, eso podría afectar a la parte que la ley reserva a sus hijos y nietos. El notario le dirá cómo encajarlo.*
+
+---
+
+Este documento **no es un testamento ni tiene validez legal**. Sirve solo para preparar la cita con el notario. No lo firme ni lo copie a mano como si fuera un testamento.
+
+Para terminar el borrador, necesito dos datos: ¿la casa está a nombre de los dos? ¿Pablo y Lucía son mayores de edad?
+
+    (artículos recuperados: 912, 672, 814, 820, 764, 851, 795, 817 · coste: $0.00212)
+------------------------------------------------------------------------------------------
+
+[8] USUARIO:
+Muchas gracias, ha sido usted muy amable
+
+[8] ASISTENTE:
+De nada, me alegra haberle podido ayudar. Ha hecho un buen trabajo preparando todo: ya tiene claros sus datos y sus dudas.
+
+Antes de ir a la notaría, le recomiendo:
+
+1. Revisar el borrador con calma y completar su nombre y apellidos, que están pendientes.
+2. Pedir cita en la notaría que le quede más cómoda.
+3. Llevar su DNI y la nota, y preguntar al notario lo que no tenga claro, sobre todo lo de la casa.
+
+Recuerde que la nota no es un testamento ni tiene validez legal. Solo sirve para preparar la cita con el notario, así que no la firme ni la copie a mano como si lo fuera.
+
+Si quiere, podemos repasar juntos alguna duda antes de la cita.
+
+    (artículos recuperados: ninguno (sin búsqueda) · coste: $0.00062)
+------------------------------------------------------------------------------------------
+
+Coste total de la conversación: $0.00964
